@@ -27,31 +27,6 @@ class Player():
         else:
             self.y += self.velocity
 
-
-class Player():
-    width = 10
-    height = 100
-
-    def __init__(self, startx, starty, color, score):
-        self.x = startx
-        self.y = starty
-        self.velocity = 5
-        self.color = color
-        self.score = score
-
-    def draw(self, g):
-        pygame.draw.rect(g, self.color ,(self.x, self.y, self.width, self.height), 0)
-
-    def move(self, dirn):
-        """
-        :param dirn: 0 - 1 (up, down)
-        :return: None
-        """
-        if dirn == 0:
-            self.y -= self.velocity
-        else:
-            self.y += self.velocity
-
 class Ball():
     width = 10
     height = 10
@@ -67,6 +42,75 @@ class Ball():
         pygame.draw.rect(g, self.color ,(self.x, self.y, self.width, self.height), 0)
 
 class Game:
+    def __init__(self, w, h):
+        self.net = Network()
+        self.width = w
+        self.height = h
+        self.canvas = Canvas(self.width, self.height, "Tela Principal")
+        self.nome = ""
+
+    def run(self):
+        clock = pygame.time.Clock()
+        done = False
+        while not done:
+            clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        done = True
+                        self.destroy()
+                    elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
+                        done = True
+                    elif event.key == pygame.K_BACKSPACE:
+                        self.nome = self.nome[:-1]
+                    else:
+                        self.nome += event.unicode
+
+            self.canvas.draw_background()
+            self.canvas.draw_text("Digite seu nome:", 30, self.width/2-75, self.height/2-70)
+            pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width/2-35, self.height/2+20, 80, 40), 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (255,255,255) ,(self.width/2-30, self.height/2+25, 70, 30), 0)
+            self.canvas.draw_text("Enter", 20, self.width/2-13, self.height/2+34)
+            self.canvas.draw_text(self.nome, 28, self.width/2-(len(self.nome)*5), self.height/2-30)
+            self.canvas.update()
+
+        # Após inserir o nome de usuário
+        data = str(self.net.id) + ":name:" + self.nome
+        reply = self.net.send(data)
+
+        done = False
+        while not done:
+            clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        done = True
+                        self.destroy()
+                    elif event.key == pygame.K_F5:
+                        data = str(self.net.id) + ":refresh"
+                        reply = self.net.send(data)
+
+            self.canvas.draw_background()
+            self.canvas.draw_text(reply, 30, self.width/2-75, self.height/2-70)
+            pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width/2-35, self.height/2+20, 80, 40), 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (255,255,255) ,(self.width/2-30, self.height/2+25, 70, 30), 0)
+            self.canvas.draw_text("F5", 20, self.width/2-13, self.height/2+34)
+            self.canvas.draw_text(self.nome, 28, self.width/2-(len(self.nome)*5), self.height/2-30)
+            self.canvas.update()
+
+        
+    def destroy(self):
+        pygame.display.quit()
+        pygame.quit()
+
+
+class Start:
     maxscore = 5
 
     def __init__(self, w, h):
@@ -74,7 +118,7 @@ class Game:
         self.width = w
         self.height = h
         self.player = Player(0, 50, (255,0,0), 0)
-        self.player2 = Player(self.width-self.player.width, 100, (0,255,0), 0)
+        self.player2 = Player(100, 100, (0,255,0), 0)
         self.ball = Ball(self.width/2, self.height/2,(0,0,255))
         self.canvas = Canvas(self.width, self.height, "Testing...")
 
@@ -86,9 +130,6 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    run = False
-
-                if event.type == pygame.K_ESCAPE:
                     run = False
 
             keys = pygame.key.get_pressed()
@@ -123,7 +164,7 @@ class Game:
         Send position to server
         :return: None
         """
-        data = str(self.net.id) + ":" + str(self.player.x) + "," + str(self.player.y)
+        data = str(self.net.id) + ":pos:" + str(self.player.x) + "," + str(self.player.y)
         reply = self.net.send(data)
         return reply
 

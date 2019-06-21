@@ -6,6 +6,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server = ''
 port = 5555
+clientList = ""
 
 server_ip = socket.gethostbyname(server)
 
@@ -19,8 +20,8 @@ s.listen(2)
 print("Waiting for a connection")
 
 currentId = "0"
-pos = ["0:50,50", "1:100,100"]
-def threaded_client(conn):
+pos = ["0:0,300", "1:500,300"]
+def threaded_client(conn, addr):
     global currentId, pos
     conn.send(str.encode(currentId))
     currentId = "1"
@@ -33,16 +34,22 @@ def threaded_client(conn):
                 conn.send(str.encode("Goodbye"))
                 break
             else:
-                print("Recieved: " + reply)
+                print("Received: " + reply)
                 arr = reply.split(":")
-                id = int(arr[0])
-                pos[id] = reply
+                if (arr[1]=="name"):
+                    clientList += "\n"+addr+": "+arr.split(",")[1]
+                    print("Sending: " + clientList)
+                elif (arr[1]=="refresh"):
+                    print("Sending: " + clientList)
+                else:
+                    id = int(arr[0])
+                    pos[id] = reply
 
-                if id == 0: nid = 1
-                if id == 1: nid = 0
+                    if id == 0: nid = 1
+                    if id == 1: nid = 0
 
-                reply = pos[nid][:]
-                print("Sending: " + reply)
+                    reply = pos[nid][:]
+                    print("Sending: " + reply)
 
             conn.sendall(str.encode(reply))
         except:
@@ -55,4 +62,4 @@ while True:
     conn, addr = s.accept()
     print("Connected to: ", addr)
 
-    start_new_thread(threaded_client, (conn,))
+    start_new_thread(threaded_client, (conn, addr))

@@ -1,5 +1,7 @@
 # Pong
 
+É necessário pip install pygame
+
 Para rodar o server:
 Ctrl+R → cmd
 cd C:\Users\tulim-acer\Desktop\pong
