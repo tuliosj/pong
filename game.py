@@ -97,11 +97,11 @@ class Game:
                         reply = self.net.send(data)
 
             self.canvas.draw_background()
-            self.canvas.draw_text(reply, 30, self.width/2-75, self.height/2-70)
+            for i,text in enumerate(reply.split(";")):
+                self.canvas.draw_text(text, 30, self.width/2-75, self.height/5+(i*20))
             pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width/2-35, self.height/2+20, 80, 40), 0)
             pygame.draw.rect(self.canvas.get_canvas(), (255,255,255) ,(self.width/2-30, self.height/2+25, 70, 30), 0)
             self.canvas.draw_text("F5", 20, self.width/2-13, self.height/2+34)
-            self.canvas.draw_text(self.nome, 28, self.width/2-(len(self.nome)*5), self.height/2-30)
             self.canvas.update()
 
         
