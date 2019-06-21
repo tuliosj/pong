@@ -57,25 +57,19 @@ class Game:
             self.nomear()
             # Após inserir o nome de usuário
             reply = self.clientList(str(self.net.id) + ":name:" + self.nome)
-            reply = self.listagem(reply)
-            done = False
-            while not done:
-
-
+            oponente = self.listagem(reply)
+            resposta = self.espera(oponente).split(";")
+            match = Match(self.width, self.height, [resposta[0],self.nome], resposta[1], resposta[2])
         except GetOutOfLoop:
             pass
         
     def nomear(self):
         done = False
         while not done:
-            self.clock.tick(60)
+            self.clock.tick(20)
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
-
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        done = True
                         self.destroy()
                         raise GetOutOfLoop
                     elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
@@ -98,27 +92,22 @@ class Game:
         oponente = 1
         done = False
         while not done:
-            self.clock.tick(60)
+            self.clock.tick(15)
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
-
                 if event.type == pygame.KEYDOWN:
                     qntClientes = len(reply)
                     if event.key == pygame.K_ESCAPE:
-                        done = True
                         self.destroy()
                         raise GetOutOfLoop
                     elif event.key == pygame.K_F5:
                         reply = self.clientList(str(self.net.id) + ":refresh")
                     elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
-                        done = True
-                        return reply
+                        return reply[oponente-1]
                     elif event.key == pygame.K_UP and oponente > 1:
                         oponente -= 1
                     elif event.key == pygame.K_DOWN and oponente < qntClientes:
                         oponente += 1
-                    elif event.key == pygame.K_UP and oponente ==1:
+                    elif event.key == pygame.K_UP and oponente == 1:
                         oponente = qntClientes
                     elif event.key == pygame.K_DOWN and oponente == qntClientes:
                         oponente = 1
@@ -136,7 +125,46 @@ class Game:
             pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
             self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
             self.canvas.update()
+
+    def espera(self, oponente):
+        done = False
+        timer = 0
+        while not done:
+            self.clock.tick(60)
+            timer += 1/60
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.destroy()
+                        raise GetOutOfLoop
+                    elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
+                        oponente = self.listagem(self.clientList(str(self.net.id) + ":refresh"))
+                        timer = 0
+
+            self.canvas.draw_background()
+            self.canvas.draw_text("Esperando " + oponente.split(": ")[1] + "...", 24, 10, 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
+            self.canvas.draw_text("Pressione enter caso queira cancelar. Segundos passados: " + str(int(timer)), 20, 10, 40)
+            pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
+            self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
+            self.canvas.update()
+            reply = self.net.send(str(self.net.id) + ":wait:" + oponente[0])
+            if reply!="nada":
+                done = True
+        done = False
+        timer = 5
+        while not done:
+            self.clock.tick(1)
+            timer -= 1
+            self.canvas.draw_background()
+            self.canvas.draw_text("Partida começará em " + str(timer), 24, 10, 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
+            self.canvas.update()
+            if timer==0:
+                done = True
         return reply
+
 
     def destroy(self):
         pygame.display.quit()
@@ -147,20 +175,26 @@ class Game:
         clientList = reply.split(";")
         for client in clientList[1:]:
             if(client.split(": ")[0] == clientList[0]):
-                clientList.remove(client)
+                #clientList.remove(client)
                 clientList.remove(clientList[0])
                 return clientList
 
 
-class Start:
+class Match:
     maxscore = 5
 
-    def __init__(self, w, h):
+    def __init__(self, w, h, eu, ele, lado):
         self.net = Network()
         self.width = w
         self.height = h
-        self.player = Player(0, 50, (255,0,0), 0)
-        self.player2 = Player(100, 100, (0,255,0), 0)
+        self.eu = eu
+        self.ele = ele.split(":")
+        if lado == 1:
+            self.player = Player(0, 50, (255,0,0), 0)
+            self.player2 = Player(self.width-10, 100, (0,255,0), 0)
+        else:
+            self.player2 = Player(0, 50, (255,0,0), 0)
+            self.player = Player(self.width-10, 100, (0,255,0), 0)
         self.ball = Ball(self.width/2, self.height/2,(0,0,255))
         self.canvas = Canvas(self.width, self.height, "Testing...")
 
@@ -193,9 +227,9 @@ class Start:
             self.player.draw(self.canvas.get_canvas())
             self.player2.draw(self.canvas.get_canvas())
             self.ball.draw(self.canvas.get_canvas())
-            self.canvas.draw_text("Jogador 1:", 30, self.width/4-30, self.height/10)
+            self.canvas.draw_text(eu[1], 30, self.width/4-30, self.height/10)
             self.canvas.draw_text(str(self.player.score)+"/"+str(self.maxscore), 20, self.width/4, 2*self.height/10)
-            self.canvas.draw_text("Jogador 2:", 30, 3*self.width/4-60, self.height/10)
+            self.canvas.draw_text(ele[1], 30, 3*self.width/4-60, self.height/10)
             self.canvas.draw_text(str(self.player2.score)+"/"+str(self.maxscore), 20, 3*self.width/4-30, 2*self.height/10)
             self.canvas.update()
 
