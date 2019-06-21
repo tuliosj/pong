@@ -60,6 +60,7 @@ class Game:
             oponente = self.listagem(reply)
             resposta = self.espera(oponente).split(";")
             match = Match(self.width, self.height, [resposta[0], self.nome], resposta[1], resposta[2])
+            match.run()
         except GetOutOfLoop:
             pass
         
@@ -89,13 +90,13 @@ class Game:
             self.canvas.update()
 
     def listagem(self, reply):
-        oponente = 1
+        oponente = 0
         done = False
         while not done:
             self.clock.tick(15)
+            qntClientes = len(reply)
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-                    qntClientes = len(reply)
                     if event.key == pygame.K_ESCAPE:
                         self.destroy()
                         raise GetOutOfLoop
@@ -117,7 +118,10 @@ class Game:
             pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
             for i,text in enumerate(reply):
                 self.canvas.draw_text(text, 20, 40, 40+(i*20))
-            pygame.draw.circle(self.canvas.get_canvas(), (100,0,0), [15,32+(oponente*20)], 10)
+            if qntClientes != 0:
+                if oponente == 0:
+                    oponente = 1
+                pygame.draw.circle(self.canvas.get_canvas(), (100,0,0), [15,32+(oponente*20)], 10)
             pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-180, self.height-50, 80, 40), 0)
             pygame.draw.rect(self.canvas.get_canvas(), (170,170,170) ,(self.width-175, self.height-45, 70, 30), 0)
             self.canvas.draw_text("F5", 14, self.width-150, self.height-38)
@@ -227,9 +231,9 @@ class Match:
             self.player.draw(self.canvas.get_canvas())
             self.player2.draw(self.canvas.get_canvas())
             self.ball.draw(self.canvas.get_canvas())
-            self.canvas.draw_text(eu[1], 30, self.width/4-30, self.height/10)
+            self.canvas.draw_text(self.eu[1], 30, self.width/4-30, self.height/10)
             self.canvas.draw_text(str(self.player.score)+"/"+str(self.maxscore), 20, self.width/4, 2*self.height/10)
-            self.canvas.draw_text(ele[1], 30, 3*self.width/4-60, self.height/10)
+            self.canvas.draw_text(self.ele[1], 30, 3*self.width/4-60, self.height/10)
             self.canvas.draw_text(str(self.player2.score)+"/"+str(self.maxscore), 20, 3*self.width/4-30, 2*self.height/10)
             self.canvas.update()
 

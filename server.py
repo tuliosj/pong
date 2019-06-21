@@ -8,6 +8,7 @@ server = ''
 port = 5555
 clientList = []
 waitlist = []
+matchOn = {}
 
 server_ip = socket.gethostbyname(server)
 
@@ -22,7 +23,7 @@ print("Waiting for a connection")
 
 pos = ["0:0,300", "1:500,300"]
 def threaded_client(conn, addr):
-    global pos, clientList, waitlist
+    global pos, clientList, matchOn
     currentId = addr[0]
     conn.send(str.encode(currentId))
     reply = ''
@@ -49,14 +50,11 @@ def threaded_client(conn, addr):
                     reply += ";"+client[0]+": "+client[1]
             elif (arr[1]=="wait"):
                 reply = waitlistManagement(arr[0],arr[2])
+                if reply != "nada":
+                    matchOn[arr[2]] = addr
             else:
-                id = int(arr[0])
-                pos[id] = reply
-
-                if id == 0: nid = 1
-                if id == 1: nid = 0
-
-                reply = str.encode(pos[addr[0]][:])
+                addr = matchOn[arr[0]]
+                reply = arr[2]
        
         print("Sending: " + reply)
         conn.sendto(reply.encode(), addr)
@@ -70,7 +68,7 @@ def threaded_client(conn, addr):
     conn.close()
 
 def waitlistManagement (p1, p2):
-    global waitlist, clientList
+    global waitlist, clientList, matchOn
     pos = 0
     foundme = 0
     foundthem = 0
@@ -94,16 +92,19 @@ def waitlistManagement (p1, p2):
         for client in clientList:
             if client[0] == p2:
                 p2 += ":"+client[1]
-                if client[2] == 3:
-                    killboth = 1
-                    clientList.remove(client)
+                break
+
+        for client in waitlist:
+            if client[0] == p2 and client[2] == 3:
+                killboth = 1
+                waitlist.remove(client)
                 break
 
         for client in waitlist:
             if client[0] == p1:
                 client[2] == 3
                 if killboth == 1:
-                    clientList.remove(client)
+                    waitlist.remove(client)
                 break
         return p1+";"+p2+";"+str(pos)
 
