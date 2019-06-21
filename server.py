@@ -7,7 +7,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server = ''
 port = 5555
 global clientList
-clientList = ""
+clientList = []
 
 server_ip = socket.gethostbyname(server)
 
@@ -36,11 +36,12 @@ def threaded_client(conn, addr):
         else:
             print("Received: " + reply)
             arr = reply.split(":")
-            if (arr[1]=="name"):
-                clientList += ";"+addr[0]+": "+arr[2]
-                reply = clientList
-            elif (arr[1]=="refresh"):
-                reply = clientList
+            if (arr[1]=="name" or arr[1]=="refresh"):
+                if (arr[1]=="name"):
+                    clientList.append((addr[0],arr[2]))
+                reply = ""
+                for client in clientList:
+                    reply += ";"+client[0]+": "+client[1]
             else:
                 id = int(arr[0])
                 pos[id] = reply
@@ -55,6 +56,10 @@ def threaded_client(conn, addr):
     
 
     print("Connection Closed")
+    for client in clientList:
+        if(client[0] == addr[0]):
+            clientList.remove(client)
+            break
     conn.close()
 
 while True:
