@@ -21,9 +21,8 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for a connection")
 
-pos = ["0:0,300", "1:500,300"]
 def threaded_client(conn, addr):
-    global pos, clientList, matchOn
+    global clientList, matchOn
     currentId = addr[0]
     conn.send(str.encode(currentId))
     reply = ''

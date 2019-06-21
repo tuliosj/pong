@@ -10,11 +10,12 @@ class Player():
     width = 10
     height = 100
 
-    def __init__(self, startx, starty, color):
+    def __init__(self, startx, starty, color, score):
         self.x = startx
         self.y = starty
         self.velocity = 5
         self.color = color
+        self.score = score
 
     def draw(self, g):
         pygame.draw.rect(g, self.color ,(self.x, self.y, self.width, self.height), 0)
@@ -193,12 +194,12 @@ class Match:
         self.height = h
         self.eu = eu
         self.ele = ele.split(":")
-        if lado == 1:
-            self.player = Player(0, 50, (255,0,0))
-            self.player2 = Player(self.width-10, 100, (0,255,0))
+        if lado == '1':
+            self.player = Player(0, 50, (255,0,0), 0)
+            self.player2 = Player(self.width-10, 100, (0,255,0), 0)
         else:
-            self.player2 = Player(0, 50, (255,0,0))
-            self.player = Player(self.width-10, 100, (0,255,0))
+            self.player2 = Player(0, 50, (255,0,0), 0)
+            self.player = Player(self.width-10, 100, (0,255,0), 0)
         self.ball = Ball(self.width/2, self.height/2,(0,0,255))
         self.canvas = Canvas(self.width, self.height, "Testing...")
 
@@ -223,7 +224,9 @@ class Match:
                     self.player.move(1)
 
             # Send Network Stuff
-            self.player2.x, self.player2.y = self.parse_data(self.send_data())
+            p2pos = self.send_data().split(",")
+            self.player2.x = int(p2pos[0])
+            self.player2.y = int(p2pos[1])
 
             # Update Canvas
             self.update()
@@ -247,14 +250,6 @@ class Match:
         data = str(self.net.id) + ":pos:" + str(self.player.x) + "," + str(self.player.y)
         reply = self.net.send(data)
         return reply
-
-    @staticmethod
-    def parse_data(data):
-        try:
-            d = data.split(":")[1].split(",")
-            return int(d[0]), int(d[1])
-        except:
-            return 0,0
 
     def update(self):
         self.ball.x += self.ball.xv
