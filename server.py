@@ -37,7 +37,13 @@ def threaded_client(conn, addr):
             arr = reply.split(":")
             if (arr[1]=="name" or arr[1]=="refresh"):
                 if (arr[1]=="name"):
-                    clientList.append((addr[0],arr[2]))
+                    foo=0
+                    for client in clientList:
+                        if client[0]==addr[0]:
+                            foo=1
+                            break
+                    if foo==0:
+                        clientList.append((addr[0],arr[2]))
                 reply = addr[0]
                 for client in clientList:
                     reply += ";"+client[0]+": "+client[1]
@@ -86,9 +92,9 @@ def waitlistManagement (p1, p2):
                 break
         for client in clientList:
             if client[0] == p2:
-                p2 += ":" client[1]
+                p2 += ":"+client[1]
                 break
-        return p1+";"+p2+";"+pos
+        return p1+";"+p2+";"+str(pos)
 
 while True:
     conn, addr = s.accept()

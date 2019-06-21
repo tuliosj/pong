@@ -59,7 +59,7 @@ class Game:
             reply = self.clientList(str(self.net.id) + ":name:" + self.nome)
             oponente = self.listagem(reply)
             resposta = self.espera(oponente).split(";")
-            match = Match(self.width, self.height, [resposta[0],self.nome], resposta[1], resposta[2])
+            match = Match(self.width, self.height, [resposta[0], self.nome], resposta[1], resposta[2])
         except GetOutOfLoop:
             pass
         
@@ -149,7 +149,7 @@ class Game:
             pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
             self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
             self.canvas.update()
-            reply = self.net.send(str(self.net.id) + ":wait:" + oponente[0])
+            reply = self.net.send(str(self.net.id) + ":wait:" + oponente.split(": ")[0])
             if reply!="nada":
                 done = True
         done = False
@@ -190,11 +190,11 @@ class Match:
         self.eu = eu
         self.ele = ele.split(":")
         if lado == 1:
-            self.player = Player(0, 50, (255,0,0), 0)
-            self.player2 = Player(self.width-10, 100, (0,255,0), 0)
+            self.player = Player(0, 50, (255,0,0))
+            self.player2 = Player(self.width-10, 100, (0,255,0))
         else:
-            self.player2 = Player(0, 50, (255,0,0), 0)
-            self.player = Player(self.width-10, 100, (0,255,0), 0)
+            self.player2 = Player(0, 50, (255,0,0))
+            self.player = Player(self.width-10, 100, (0,255,0))
         self.ball = Ball(self.width/2, self.height/2,(0,0,255))
         self.canvas = Canvas(self.width, self.height, "Testing...")
 
