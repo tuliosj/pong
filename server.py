@@ -50,10 +50,10 @@ def threaded_client(conn, addr):
             elif (arr[1]=="wait"):
                 reply = waitlistManagement(arr[0],arr[2])
                 if reply != "nada":
-                    matchOn[arr[2]] = addr
+                    matchOn[arr[2]] = [addr, 0]
             else:
-                addr = matchOn[arr[0]]
-                reply = arr[2]
+                matchOn[arr[0]][1] = arr[2]
+                reply = matchOn[matchOn[arr[0]]][1]
        
         print("Sending: " + reply)
         conn.sendto(reply.encode(), addr)

@@ -207,7 +207,7 @@ class Match:
         clock = pygame.time.Clock()
         run = True
         while run:
-            clock.tick(60)
+            clock.tick(1)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -224,9 +224,7 @@ class Match:
                     self.player.move(1)
 
             # Send Network Stuff
-            p2pos = self.send_data().split(",")
-            self.player2.x = int(p2pos[0])
-            self.player2.y = int(p2pos[1])
+            self.player2.y = int(self.send_data())
 
             # Update Canvas
             self.update()
@@ -247,7 +245,7 @@ class Match:
         Send position to server
         :return: None
         """
-        data = str(self.net.id) + ":pos:" + str(self.player.x) + "," + str(self.player.y)
+        data = str(self.net.id) + ":pos:" + str(self.player.y)
         reply = self.net.send(data)
         return reply
 
@@ -264,8 +262,8 @@ class Match:
             else:
                 self.player2.score += 1
                 self.ball = Ball(self.width/2, self.height/2,(0,0,255))
-                self.player = Player(0, self.height/2, self.player.color, self.player.score)
-                self.player2 = Player(self.width-self.player.width, self.height/2, self.player.color, self.player2.score)
+                self.player = Player(self.player.x, (self.width-self.player.height)/2, self.player.color, self.player.score)
+                self.player2 = Player(self.player2.x, (self.width-self.player2.height)/2, self.player2.color, self.player2.score)
 
         if(self.ball.x>self.width):
             if(self.ball.y>self.player2.y and self.ball.y<self.player2.y+self.player2.height):
