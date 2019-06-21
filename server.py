@@ -53,7 +53,7 @@ def threaded_client(conn, addr):
                     matchOn[arr[2]] = [addr, 0]
             else:
                 matchOn[arr[0]][1] = arr[2]
-                reply = matchOn[matchOn[arr[0]]][1]
+                reply = str(matchOn[matchOn[arr[0]][0][0]][1])
        
         print("Sending: " + reply)
         conn.sendto(reply.encode(), addr)
