@@ -72,27 +72,38 @@ def threaded_client(conn, addr):
 def waitlistManagement (p1, p2):
     global waitlist, clientList
     pos = 0
-    found = 0
+    foundme = 0
+    foundthem = 0
     for client in waitlist:
         if client[0]==p1:
-            found = 1
+            foundme = 1
             pos = client[2]
         if client[1]==p1:
+            foundthem = 1
             pos = (client[2]%2)+1
-    if found == 0:
+    if foundme == 0:
         if pos == 0:
             waitlist.append((p1,p2,1))
         else:
-            waitlist.append((p1,p2,found))
+            waitlist.append((p1,p2,pos))
+        return "nada"
+    elif foundthem == 0:
         return "nada"
     else:
-        for client in waitlist:
-            if client[0] == p1:
-                waitlist.remove(client)
-                break
+        killboth = 0
         for client in clientList:
             if client[0] == p2:
                 p2 += ":"+client[1]
+                if client[2] == 3:
+                    killboth = 1
+                    clientList.remove(client)
+                break
+
+        for client in waitlist:
+            if client[0] == p1:
+                client[2] == 3
+                if killboth == 1:
+                    clientList.remove(client)
                 break
         return p1+";"+p2+";"+str(pos)
 

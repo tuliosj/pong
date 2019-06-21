@@ -130,8 +130,8 @@ class Game:
         done = False
         timer = 0
         while not done:
-            self.clock.tick(60)
-            timer += 1/60
+            self.clock.tick(30)
+            timer += 1
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -144,7 +144,7 @@ class Game:
             self.canvas.draw_background()
             self.canvas.draw_text("Esperando " + oponente.split(": ")[1] + "...", 24, 10, 0)
             pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
-            self.canvas.draw_text("Pressione enter caso queira cancelar. Segundos passados: " + str(int(timer)), 20, 10, 40)
+            self.canvas.draw_text("Pressione enter caso queira cancelar. Segundos passados: " + str(int(timer/30)), 20, 10, 40)
             pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
             pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
             self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
@@ -175,7 +175,7 @@ class Game:
         clientList = reply.split(";")
         for client in clientList[1:]:
             if(client.split(": ")[0] == clientList[0]):
-                #clientList.remove(client)
+                clientList.remove(client)
                 clientList.remove(clientList[0])
                 return clientList
 
