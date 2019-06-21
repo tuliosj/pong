@@ -50,87 +50,106 @@ class Game:
         self.height = h
         self.canvas = Canvas(self.width, self.height, "Tela Principal")
         self.nome = ""
+        self.clock = pygame.time.Clock()
 
     def run(self):
-        clock = pygame.time.Clock()
         try:
-            done = False
-            while not done:
-                clock.tick(60)
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        done = True
-
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            done = True
-                            self.destroy()
-                            raise GetOutOfLoop
-                        elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
-                            done = True
-                        elif event.key == pygame.K_BACKSPACE:
-                            self.nome = self.nome[:-1]
-                        else:
-                            self.nome += event.unicode
-
-                self.canvas.draw_background()
-                self.canvas.draw_text("Digite seu nome:", 24, 10, 0)
-                pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
-                self.canvas.draw_text(self.nome, 20, 10, 40)
-                pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
-                pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
-                self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
-                self.canvas.update()
-
+            self.nomear()
             # Após inserir o nome de usuário
-            data = str(self.net.id) + ":name:" + self.nome
-            reply = self.net.send(data)
-            oponente = 1
-
+            reply = self.clientList(str(self.net.id) + ":name:" + self.nome)
+            reply = self.listagem(reply)
             done = False
             while not done:
-                clock.tick(60)
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        done = True
 
-                    if event.type == pygame.KEYDOWN:
-                        qntClientes = len(reply.split(";"))-1
-                        if event.key == pygame.K_ESCAPE:
-                            done = True
-                            self.destroy()
-                            raise GetOutOfLoop
-                        elif event.key == pygame.K_F5:
-                            data = str(self.net.id) + ":refresh"
-                            reply = self.net.send(data)
-                        elif event.key == pygame.K_UP and oponente > 1:
-                            oponente -= 1
-                        elif event.key == pygame.K_DOWN and oponente < qntClientes:
-                            oponente += 1
-                        elif event.key == pygame.K_UP and oponente ==1:
-                            oponente = qntClientes
-                        elif event.key == pygame.K_DOWN and oponente == qntClientes:
-                            oponente = 1
 
-                self.canvas.draw_background()
-                self.canvas.draw_text("Jogadores disponíveis", 24, 10, 0)
-                pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
-                for i,text in enumerate(reply.split(";")):
-                    self.canvas.draw_text(text, 20, 40, 20+(i*20))
-                pygame.draw.circle(self.canvas.get_canvas(), (100,0,0), [15,32+(oponente*20)], 10)
-                pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-180, self.height-50, 80, 40), 0)
-                pygame.draw.rect(self.canvas.get_canvas(), (170,170,170) ,(self.width-175, self.height-45, 70, 30), 0)
-                self.canvas.draw_text("F5", 14, self.width-150, self.height-38)
-                pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
-                pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
-                self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
-                self.canvas.update()
         except GetOutOfLoop:
             pass
         
+    def nomear(self):
+        done = False
+        while not done:
+            self.clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        done = True
+                        self.destroy()
+                        raise GetOutOfLoop
+                    elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
+                        done = True
+                    elif event.key == pygame.K_BACKSPACE:
+                        self.nome = self.nome[:-1]
+                    else:
+                        self.nome += event.unicode
+
+            self.canvas.draw_background()
+            self.canvas.draw_text("Digite seu nome:", 24, 10, 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
+            self.canvas.draw_text(self.nome, 20, 10, 40)
+            pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
+            self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
+            self.canvas.update()
+
+    def listagem(self, reply):
+        oponente = 1
+        done = False
+        while not done:
+            self.clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+
+                if event.type == pygame.KEYDOWN:
+                    qntClientes = len(reply)
+                    if event.key == pygame.K_ESCAPE:
+                        done = True
+                        self.destroy()
+                        raise GetOutOfLoop
+                    elif event.key == pygame.K_F5:
+                        reply = self.clientList(str(self.net.id) + ":refresh")
+                    elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
+                        done = True
+                        return reply
+                    elif event.key == pygame.K_UP and oponente > 1:
+                        oponente -= 1
+                    elif event.key == pygame.K_DOWN and oponente < qntClientes:
+                        oponente += 1
+                    elif event.key == pygame.K_UP and oponente ==1:
+                        oponente = qntClientes
+                    elif event.key == pygame.K_DOWN and oponente == qntClientes:
+                        oponente = 1
+
+            self.canvas.draw_background()
+            self.canvas.draw_text("Jogadores disponíveis", 24, 10, 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
+            for i,text in enumerate(reply):
+                self.canvas.draw_text(text, 20, 40, 40+(i*20))
+            pygame.draw.circle(self.canvas.get_canvas(), (100,0,0), [15,32+(oponente*20)], 10)
+            pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-180, self.height-50, 80, 40), 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (170,170,170) ,(self.width-175, self.height-45, 70, 30), 0)
+            self.canvas.draw_text("F5", 14, self.width-150, self.height-38)
+            pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
+            self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
+            self.canvas.update()
+        return reply
+
     def destroy(self):
         pygame.display.quit()
         pygame.quit()
+
+    def clientList(self, data):
+        reply = self.net.send(data)
+        clientList = reply.split(";")
+        for client in clientList[1:]:
+            if(client.split(": ")[0] == clientList[0]):
+                clientList.remove(client)
+                clientList.remove(clientList[0])
+                return clientList
 
 
 class Start:

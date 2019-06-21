@@ -39,7 +39,7 @@ def threaded_client(conn, addr):
             if (arr[1]=="name" or arr[1]=="refresh"):
                 if (arr[1]=="name"):
                     clientList.append((addr[0],arr[2]))
-                reply = ""
+                reply = addr[0]
                 for client in clientList:
                     reply += ";"+client[0]+": "+client[1]
             else:
