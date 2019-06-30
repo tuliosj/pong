@@ -229,7 +229,7 @@ class Match:
 
             # Send Network Stuff
             if self.lado == "1":
-                self.player2.y = int(self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(self.ball.x) + "," + str(self.ball.y)))
+                self.player2.y = int(self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y))))
             else:
                 reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y)).split(":pos:")[1].split(",")
                 self.player.y = int(reply[0])
