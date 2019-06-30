@@ -194,6 +194,7 @@ class Match:
         self.height = h
         self.eu = eu
         self.ele = ele.split(":")
+        self.lado = lado
         self.player = Player(0, 50, (255,0,0), 0)
         self.player2 = Player(self.width-10, 100, (0,255,0), 0)
         self.ball = Ball(self.width/2, self.height/2,(0,0,255))
@@ -211,27 +212,34 @@ class Match:
 
             keys = pygame.key.get_pressed()
 
-            if keys[pygame.K_UP]:
-                if self.player.y >= self.player.velocity and self.player.y > 0:
-                    self.player.move(0)
-
-            if keys[pygame.K_DOWN]:
-                if self.player.y <= self.height - self.player.velocity and self.player.y < self.height - self.player.height:
-                    self.player.move(1)
+            if self.lado == "1":
+                if keys[pygame.K_UP]:
+                    if self.player.y >= self.player.velocity and self.player.y > 0:
+                        self.player.move(0)
+                if keys[pygame.K_DOWN]:
+                    if self.player.y <= self.height - self.player.velocity and self.player.y < self.height - self.player.height:
+                        self.player.move(1)
+            else:
+                if keys[pygame.K_UP]:
+                    if self.player2.y >= self.player2.velocity and self.player2.y > 0:
+                        self.player2.move(0)
+                if keys[pygame.K_DOWN]:
+                    if self.player2.y <= self.height - self.player2.velocity and self.player2.y < self.height - self.player2.height:
+                        self.player2.move(1)
 
             # Send Network Stuff
-            if lado == "1":
+            if self.lado == "1":
                 self.player2.y = int(self.send_data())
             else:
                 self.player.y = int(self.send_data())
 
-            # Update Canvas
+            # Update Canvas 
             self.update()
             self.canvas.draw_background()
             self.player.draw(self.canvas.get_canvas())
             self.player2.draw(self.canvas.get_canvas())
             self.ball.draw(self.canvas.get_canvas())
-            if lado == "1":
+            if self.lado == "1":
                 self.canvas.draw_text(self.eu[1], 30, self.width/4-30, self.height/10)
                 self.canvas.draw_text(str(self.player.score)+"/"+str(self.maxscore), 20, self.width/4, 2*self.height/10)
                 self.canvas.draw_text(self.ele[1], 30, 3*self.width/4-60, self.height/10)
@@ -260,9 +268,9 @@ class Match:
         if((self.ball.y<self.player.width and self.ball.yv<0) or (self.ball.y>self.height and self.ball.yv>0)):
             self.ball.yv = -self.ball.yv
 
-        if(self.ball.x<0):
+        if(self.ball.x<self.player.height):
             if(self.ball.y>self.player.y and self.ball.y<self.player.y+self.player.height):
-                self.ball.xv = -self.ball.xv
+                self.ball.xv = 2 + abs(self.ball.y-self.player.y-self.player.height/2)/15
                 self.ball.yv = 0.3*(self.ball.y-(self.player.y+self.player.height)/2)
             else:
                 self.player2.score += 1
@@ -270,9 +278,9 @@ class Match:
                 self.player = Player(self.player.x, int((self.width-self.player.height)/2), self.player.color, self.player.score)
                 self.player2 = Player(self.player2.x, int((self.width-self.player2.height)/2), self.player2.color, self.player2.score)
 
-        if(self.ball.x>self.width):
+        if(self.ball.x>self.width-self.player.height):
             if(self.ball.y>self.player2.y and self.ball.y<self.player2.y+self.player2.height):
-                self.ball.xv = -self.ball.xv
+                self.ball.xv = - 2 - abs(self.ball.y-self.player2.y-self.player2.height/2)/15
                 self.ball.yv = 0.3*(self.ball.y-(self.player2.y+self.player2.height)/2)
             else:
                 self.player.score += 1
