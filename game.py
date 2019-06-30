@@ -229,9 +229,12 @@ class Match:
 
             # Send Network Stuff
             if self.lado == "1":
-                self.player2.y = int(self.send_data())
+                self.player2.y = int(self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(self.ball.x) + "," + str(self.ball.y)))
             else:
-                self.player.y = int(self.send_data())
+                reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y)).split(":pos:")[1].split(",")
+                self.player.y = int(reply[0])
+                self.ball.x = int(reply[1])
+                self.ball.y = int(reply[2])
 
             # Update Canvas 
             self.update()
@@ -252,15 +255,6 @@ class Match:
             self.canvas.update()
 
         pygame.quit()
-
-    def send_data(self):
-        """
-        Send position to server
-        :return: None
-        """
-        data = str(self.net.id) + ":pos:" + str(self.player.y)
-        reply = self.net.send(data)
-        return reply
 
     def update(self):
         self.ball.x += self.ball.xv
