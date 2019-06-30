@@ -231,7 +231,7 @@ class Match:
             if self.lado == "1":
                 self.player2.y = int(self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y))))
             else:
-                reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y)).split(":pos:")[1].split(",")
+                reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y)).split(":pos:")[0].split(",")
                 self.player.y = int(reply[0])
                 self.ball.x = int(reply[1])
                 self.ball.y = int(reply[2])
@@ -262,7 +262,7 @@ class Match:
         if((self.ball.y<self.player.width and self.ball.yv<0) or (self.ball.y>self.height and self.ball.yv>0)):
             self.ball.yv = -self.ball.yv
 
-        if(self.ball.x<self.player.height):
+        if(self.ball.x<self.player.width):
             if(self.ball.y>self.player.y and self.ball.y<self.player.y+self.player.height):
                 self.ball.xv = 2 + abs(self.ball.y-self.player.y-self.player.height/2)/15
                 self.ball.yv = 0.3*(self.ball.y-(self.player.y+self.player.height)/2)
@@ -272,7 +272,7 @@ class Match:
                 self.player = Player(self.player.x, int((self.width-self.player.height)/2), self.player.color, self.player.score)
                 self.player2 = Player(self.player2.x, int((self.width-self.player2.height)/2), self.player2.color, self.player2.score)
 
-        if(self.ball.x>self.width-self.player.height):
+        if(self.ball.x>self.width-self.player.width):
             if(self.ball.y>self.player2.y and self.ball.y<self.player2.y+self.player2.height):
                 self.ball.xv = - 2 - abs(self.ball.y-self.player2.y-self.player2.height/2)/15
                 self.ball.yv = 0.3*(self.ball.y-(self.player2.y+self.player2.height)/2)
