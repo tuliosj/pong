@@ -235,8 +235,9 @@ class Match:
             else:
                 reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y)).split(":pos:")[0].split(",")
                 self.player.y = int(reply[0])
-                self.ball.x = int(reply[1])
-                self.ball.y = int(reply[2])
+                if len(reply) > 1:
+                    self.ball.x = int(reply[1])
+                    self.ball.y = int(reply[2])
 
             # Update Canvas 
             self.update()
@@ -270,9 +271,9 @@ class Match:
                 #self.ball.yv = - self.ball.yv
                 #self.ball.xv = 2 + abs(self.ball.y-self.player.y-self.player.height/2)/15
                 #self.ball.yv = 0.3*(self.ball.y-(self.player.y+self.player.height)/2)
-                angulo = (((self.player.y+(self.player.height/2))-self.ball.y)/(self.player.y/2))*5/12*Math.pi
-                self.ball.xv *= Math.cos(angulo)
-                self.ball.yv *= (-Math.cos(angulo))
+                angulo = abs(self.ball.y-self.player.y-self.player.height/2)
+                self.ball.xv = (2+angulo/12)
+                self.ball.yv = angulo/7
             else:
                 self.player2.score += 1
                 self.ball = Ball(self.width/2, self.height/2,(0,0,255))
@@ -286,9 +287,9 @@ class Match:
                 #self.ball.yv = - self.ball.yv
                 #self.ball.xv = - 2 - abs(self.ball.y-self.player2.y-self.player2.height/2)/15
                 #self.ball.yv = 0.3*(self.ball.y-(self.player2.y+self.player2.height)/2)
-                angulo = (((self.player2.y+(self.player2.height/2))-self.ball.y)/(self.player2.y/2))*5/12*Math.pi
-                self.ball.xv *= Math.cos(angulo)
-                self.ball.yv *= (-Math.cos(angulo))
+                angulo = abs(self.ball.y-self.player2.y-self.player2.height/2)
+                self.ball.xv = -(2+angulo/12)
+                self.ball.yv = -angulo/7
             else:
                 self.player.score += 1
                 self.ball = Ball(self.width/2, self.height/2,(0,0,255))
