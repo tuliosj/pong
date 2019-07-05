@@ -264,18 +264,23 @@ class Match:
 
         if(self.ball.x<self.player.width):
             if(self.ball.y>self.player.y and self.ball.y<self.player.y+self.player.height):
-                self.ball.xv = 2 + abs(self.ball.y-self.player.y-self.player.height/2)/15
-                self.ball.yv = 0.3*(self.ball.y-(self.player.y+self.player.height)/2)
+                self.ball.xv = - self.ball.xv
+                self.ball.yv = - self.ball.yv
+                #self.ball.xv = 2 + abs(self.ball.y-self.player.y-self.player.height/2)/15
+                #self.ball.yv = 0.3*(self.ball.y-(self.player.y+self.player.height)/2)
             else:
                 self.player2.score += 1
                 self.ball = Ball(self.width/2, self.height/2,(0,0,255))
                 self.player = Player(self.player.x, int((self.width-self.player.height)/2), self.player.color, self.player.score)
                 self.player2 = Player(self.player2.x, int((self.width-self.player2.height)/2), self.player2.color, self.player2.score)
 
+        # Se a bola bater no canto direito
         if(self.ball.x>self.width-self.player.width):
             if(self.ball.y>self.player2.y and self.ball.y<self.player2.y+self.player2.height):
-                self.ball.xv = - 2 - abs(self.ball.y-self.player2.y-self.player2.height/2)/15
-                self.ball.yv = 0.3*(self.ball.y-(self.player2.y+self.player2.height)/2)
+                self.ball.xv = - self.ball.xv
+                self.ball.yv = - self.ball.yv
+#                self.ball.xv = - 2 - abs(self.ball.y-self.player2.y-self.player2.height/2)/15
+#                self.ball.yv = 0.3*(self.ball.y-(self.player2.y+self.player2.height)/2)
             else:
                 self.player.score += 1
                 self.ball = Ball(self.width/2, self.height/2,(0,0,255))
