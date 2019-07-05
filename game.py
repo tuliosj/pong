@@ -18,19 +18,21 @@ class Player():
         self.velocity = 5
         self.color = color
         self.score = score
+        self.direction = 0
 
     def draw(self, g):
         pygame.draw.rect(g, self.color ,(self.x, self.y, self.width, self.height), 0)
 
     def move(self, dirn):
-        """
-        :param dirn: 0 - 1 (up, down)
-        :return: None
-        """
+        if self.direction == dirn:
+            self.velocity += 1
+        else:
+            self.velocity = 5
         if dirn == 0:
             self.y -= self.velocity
         else:
             self.y += self.velocity
+        self.direction = dirn
 
 class Ball():
     width = 10
@@ -189,6 +191,7 @@ class Game:
 
 class Match:
     maxscore = 5
+    winner = 0
 
     def __init__(self, w, h, eu, ele, lado):
         self.net = Network()
@@ -204,13 +207,16 @@ class Match:
 
     def run(self):
         clock = pygame.time.Clock()
-        run = True
-        while run:
+        done = False
+        while not done:
             clock.tick(60)
+
+            if winner != 0:
+                done = True
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    run = False
+                    done = True
 
             keys = pygame.key.get_pressed()
 
@@ -257,6 +263,15 @@ class Match:
                 self.canvas.draw_text(str(self.player.score)+"/"+str(self.maxscore), 20, 3*self.width/4-30, 2*self.height/10)
             self.canvas.update()
 
+        # Update Canvas 
+        self.update()
+        self.canvas.draw_background()
+        if winner == 1:
+            self.canvas.draw_text("Vitória de "+self.eu[1]+"!"+, 24, 10, 0)
+        else:
+            self.canvas.draw_text("Vitória de "+self.ele[1]+"!"+, 24, 10, 0)
+        pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
+        self.canvas.update()
         pygame.quit()
 
     def update(self):
@@ -265,35 +280,35 @@ class Match:
         if((self.ball.y<self.player.width and self.ball.yv<0) or (self.ball.y>self.height and self.ball.yv>0)):
             self.ball.yv = -self.ball.yv
 
+        # Se a bola bater no canto esquerdo
         if(self.ball.x<self.player.width):
             if(self.ball.y>self.player.y and self.ball.y<self.player.y+self.player.height):
-                #self.ball.xv = - self.ball.xv
-                #self.ball.yv = - self.ball.yv
-                #self.ball.xv = 2 + abs(self.ball.y-self.player.y-self.player.height/2)/15
-                #self.ball.yv = 0.3*(self.ball.y-(self.player.y+self.player.height)/2)
                 angulo = abs(self.ball.y-self.player.y-self.player.height/2)
                 self.ball.xv = (2+angulo/12)
                 self.ball.yv = angulo/7
             else:
                 self.player2.score += 1
-                self.ball = Ball(self.width/2, self.height/2,(0,0,255))
-                self.player = Player(self.player.x, int((self.width-self.player.height)/2), self.player.color, self.player.score)
-                self.player2 = Player(self.player2.x, int((self.width-self.player2.height)/2), self.player2.color, self.player2.score)
+                self.pointScored()
 
         # Se a bola bater no canto direito
-        if(self.ball.x>self.width-self.player.width):
+        if(self.ball.x>self.width-self.player.width-self.ball.width):
             if(self.ball.y>self.player2.y and self.ball.y<self.player2.y+self.player2.height):
-                #self.ball.xv = - self.ball.xv
-                #self.ball.yv = - self.ball.yv
-                #self.ball.xv = - 2 - abs(self.ball.y-self.player2.y-self.player2.height/2)/15
-                #self.ball.yv = 0.3*(self.ball.y-(self.player2.y+self.player2.height)/2)
                 angulo = abs(self.ball.y-self.player2.y-self.player2.height/2)
                 self.ball.xv = -(2+angulo/12)
                 self.ball.yv = -angulo/7
             else:
                 self.player.score += 1
-                self.ball = Ball(self.width/2, self.height/2,(0,0,255))
+                self.pointScored()
 
+    def pointScored(self):
+        if (self.player.score == self.maxscore) and (lado == "1") or (self.player2.score == self.maxscore) and (lado == "2"):
+            winner = 1
+        elif (self.player2.score == self.maxscore) and (lado == "1") or (self.player.score == self.maxscore) and (lado == "2"):
+            winner = 2
+        else:
+            self.ball = Ball(self.width/2, self.height/2,(0,0,255))
+            self.player = Player(self.player.x, int((self.width-self.player.height)/2), self.player.color, self.player.score)
+            self.player2 = Player(self.player2.x, int((self.width-self.player2.height)/2), self.player2.color, self.player2.score)
 
 class Canvas:
 
