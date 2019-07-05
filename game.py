@@ -41,8 +41,12 @@ class Ball():
     def __init__(self, startx, starty, color):
         self.x = startx
         self.y = starty
-        self.xv = randint(-4,4)
-        self.yv = randint(-4,4)
+        self.xv = 0
+        while self.xv == 0:
+            self.xv = randint(-4,4)
+        self.yv = 0
+        while self.yv == 0:
+            self.yv = randint(-4,4)
         self.color = color
 
     def draw(self, g):
@@ -211,7 +215,7 @@ class Match:
         while not done:
             clock.tick(60)
 
-            if winner != 0:
+            if self.winner != 0:
                 done = True
 
             for event in pygame.event.get():
@@ -266,10 +270,10 @@ class Match:
         # Update Canvas 
         self.update()
         self.canvas.draw_background()
-        if winner == 1:
-            self.canvas.draw_text("Vitória de "+self.eu[1]+"!"+, 24, 10, 0)
+        if self.winner == 1:
+            self.canvas.draw_text("Vitória de "+self.eu[1]+"!", 24, 10, 0)
         else:
-            self.canvas.draw_text("Vitória de "+self.ele[1]+"!"+, 24, 10, 0)
+            self.canvas.draw_text("Vitória de "+self.ele[1]+"!", 24, 10, 0)
         pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
         self.canvas.update()
         pygame.quit()
@@ -302,9 +306,9 @@ class Match:
 
     def pointScored(self):
         if (self.player.score == self.maxscore) and (lado == "1") or (self.player2.score == self.maxscore) and (lado == "2"):
-            winner = 1
+            self.winner = 1
         elif (self.player2.score == self.maxscore) and (lado == "1") or (self.player.score == self.maxscore) and (lado == "2"):
-            winner = 2
+            self.winner = 2
         else:
             self.ball = Ball(self.width/2, self.height/2,(0,0,255))
             self.player = Player(self.player.x, int((self.width-self.player.height)/2), self.player.color, self.player.score)
