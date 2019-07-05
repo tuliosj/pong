@@ -25,7 +25,7 @@ class Player():
 
     def move(self, dirn):
         if self.direction == dirn:
-            self.velocity += 1
+            self.velocity += 0.4
         else:
             self.velocity = 5
         if dirn == 0:
@@ -44,9 +44,7 @@ class Ball():
         self.xv = 0
         while self.xv == 0:
             self.xv = randint(-4,4)
-        self.yv = 0
-        while self.yv == 0:
-            self.yv = randint(-4,4)
+        self.yv = randint(-4,4)
         self.color = color
 
     def draw(self, g):
@@ -305,9 +303,9 @@ class Match:
                 self.pointScored()
 
     def pointScored(self):
-        if (self.player.score == self.maxscore) and (lado == "1") or (self.player2.score == self.maxscore) and (lado == "2"):
+        if (self.player.score == self.maxscore) and (self.lado == "1") or (self.player2.score == self.maxscore) and (self.lado == "2"):
             self.winner = 1
-        elif (self.player2.score == self.maxscore) and (lado == "1") or (self.player.score == self.maxscore) and (lado == "2"):
+        elif (self.player2.score == self.maxscore) and (self.lado == "1") or (self.player.score == self.maxscore) and (self.lado == "2"):
             self.winner = 2
         else:
             self.ball = Ball(self.width/2, self.height/2,(0,0,255))
