@@ -2,6 +2,8 @@ import contextlib
 with contextlib.redirect_stdout(None):
     import pygame
 from network import Network
+from random import randint
+import math
 
 class GetOutOfLoop( Exception ):
     pass
@@ -37,8 +39,8 @@ class Ball():
     def __init__(self, startx, starty, color):
         self.x = startx
         self.y = starty
-        self.xv = 3
-        self.yv = 3
+        self.xv = randint(-4,4)
+        self.yv = randint(-4,4)
         self.color = color
 
     def draw(self, g):
@@ -264,10 +266,13 @@ class Match:
 
         if(self.ball.x<self.player.width):
             if(self.ball.y>self.player.y and self.ball.y<self.player.y+self.player.height):
-                self.ball.xv = - self.ball.xv
-                self.ball.yv = - self.ball.yv
+                #self.ball.xv = - self.ball.xv
+                #self.ball.yv = - self.ball.yv
                 #self.ball.xv = 2 + abs(self.ball.y-self.player.y-self.player.height/2)/15
                 #self.ball.yv = 0.3*(self.ball.y-(self.player.y+self.player.height)/2)
+                angulo = (((self.player.y+(self.player.height/2))-self.ball.y)/(self.player.y/2))*5/12*Math.pi
+                self.ball.xv *= Math.cos(angulo)
+                self.ball.yv *= (-Math.cos(angulo))
             else:
                 self.player2.score += 1
                 self.ball = Ball(self.width/2, self.height/2,(0,0,255))
@@ -277,10 +282,13 @@ class Match:
         # Se a bola bater no canto direito
         if(self.ball.x>self.width-self.player.width):
             if(self.ball.y>self.player2.y and self.ball.y<self.player2.y+self.player2.height):
-                self.ball.xv = - self.ball.xv
-                self.ball.yv = - self.ball.yv
-#                self.ball.xv = - 2 - abs(self.ball.y-self.player2.y-self.player2.height/2)/15
-#                self.ball.yv = 0.3*(self.ball.y-(self.player2.y+self.player2.height)/2)
+                #self.ball.xv = - self.ball.xv
+                #self.ball.yv = - self.ball.yv
+                #self.ball.xv = - 2 - abs(self.ball.y-self.player2.y-self.player2.height/2)/15
+                #self.ball.yv = 0.3*(self.ball.y-(self.player2.y+self.player2.height)/2)
+                angulo = (((self.player2.y+(self.player2.height/2))-self.ball.y)/(self.player2.y/2))*5/12*Math.pi
+                self.ball.xv *= Math.cos(angulo)
+                self.ball.yv *= (-Math.cos(angulo))
             else:
                 self.player.score += 1
                 self.ball = Ball(self.width/2, self.height/2,(0,0,255))
