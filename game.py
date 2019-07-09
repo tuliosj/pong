@@ -286,8 +286,6 @@ class Match:
 
         done = False
         while not done:
-            self.clock.tick(15)
-            qntClientes = len(reply)
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
