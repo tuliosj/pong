@@ -208,7 +208,7 @@ class Match:
         self.player = Player(0, 50, (255,0,0), 0)
         self.player2 = Player(self.width-10, 100, (0,255,0), 0)
         self.ball = Ball(self.width/2, self.height/2,(0,0,255))
-        self.canvas = Canvas(self.width, self.height, "Testing...")
+        self.canvas = Canvas(self.width, self.height, "Partida em andamento...")
 
     def run(self):
         clock = pygame.time.Clock()
@@ -296,7 +296,7 @@ class Match:
                     if event.key == pygame.K_ESCAPE:
                         return self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
                     elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
-                        return self.clientList(str(self.net.id) + ":selfdelete")
+                        return str(self.net.id) + ":selfdelete"
 
             reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
 
