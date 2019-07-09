@@ -5,7 +5,7 @@ import sys
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server = ''
-port = 5555
+port = 1999
 clientList = []
 waitlist = []
 matchOn = {}
@@ -51,19 +51,38 @@ def threaded_client(conn, addr):
                 reply = waitlistManagement(arr[0],arr[2])
                 if reply != "nada":
                     matchOn[arr[2]] = [addr, 0]
+            elif (arr[1]=="acabou"):
+                matchOn[arr[0]][1] = "acabou:" + arr[2]
+            elif (arr[1]=="selfdelete"):
+                p2 = matchOn[arr[0]][0][0]
+                del matchOn[p2]
+                for client in clientList:
+                    if(client[0] == p2):
+                        clientList.remove(client)
+                        break
+                reply = "nada"
             else:
-                matchOn[arr[0]][1] = arr[2]
-                reply = str(matchOn[matchOn[arr[0]][0][0]][1])
+                # matchOn é um dict onde o IP arr[0] (do jogador atual) retorna uma tupla com endereço e uma string com posições
+                if matchOn[arr[0]][0][0] in matchOn:
+                    matchOn[arr[0]][1] = arr[2]
+                    reply = str(matchOn[matchOn[arr[0]][0][0]][1]) # reply é posição do inimigo
+                else:
+                    reply = "acabou:0"
+                    del matchOn[arr[0]]
+
        
         print("Sending: " + reply)
         conn.sendto(reply.encode(), addr)
     
 
     print("Connection Closed")
+    print(matchOn)
     for client in clientList:
         if(client[0] == addr[0]):
             clientList.remove(client)
             break
+
+    del matchOn[addr[0]]
     conn.close()
 
 def waitlistManagement (p1, p2):

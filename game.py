@@ -29,9 +29,9 @@ class Player():
         else:
             self.velocity = 5
         if dirn == 0:
-            self.y -= self.velocity
+            self.y = round(self.y-self.velocity)
         else:
-            self.y += self.velocity
+            self.y = round(self.y+self.velocity)
         self.direction = dirn
 
 class Ball():
@@ -61,13 +61,15 @@ class Game:
 
     def run(self):
         try:
-            self.nomear()
+            if self.nome == "":
+                self.nomear()
             # Após inserir o nome de usuário
             reply = self.clientList(str(self.net.id) + ":name:" + self.nome)
             oponente = self.listagem(reply)
             resposta = self.espera(oponente).split(";")
             match = Match(self.width, self.height, [resposta[0], self.nome], resposta[1], resposta[2])
             match.run()
+            self.run()
         except GetOutOfLoop:
             pass
         
@@ -110,7 +112,8 @@ class Game:
                     elif event.key == pygame.K_F5:
                         reply = self.clientList(str(self.net.id) + ":refresh")
                     elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
-                        return reply[oponente-1]
+                        if oponente != 0:
+                            return reply[oponente-1]
                     elif event.key == pygame.K_UP and oponente > 1:
                         oponente -= 1
                     elif event.key == pygame.K_DOWN and oponente < qntClientes:
@@ -239,13 +242,29 @@ class Match:
 
             # Send Network Stuff
             if self.lado == "1":
-                self.player2.y = int(self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y))))
+                if self.winner != 0:
+                    reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
+                else:
+                    reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y)))
+                if reply.split(":")[0] == "acabou":
+                    done = True
+                    self.winner = int(reply.split(":")[1])
+                else:
+                    self.player2.y = int(reply)
             else:
-                reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y)).split(":pos:")[0].split(",")
-                self.player.y = int(reply[0])
-                if len(reply) > 1:
-                    self.ball.x = int(reply[1])
-                    self.ball.y = int(reply[2])
+                if self.winner != 0:
+                    reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
+                else:
+                    reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y))
+                if reply.split(":")[0] == "acabou":
+                    done = True
+                    self.winner = int(reply.split(":")[1])
+                else:
+                    reply = reply.split(":pos:")[0].split(",")
+                    self.player.y = int(reply[0])
+                    if len(reply) > 1:
+                        self.ball.x = int(reply[1])
+                        self.ball.y = int(reply[2])
 
             # Update Canvas 
             self.update()
@@ -265,16 +284,32 @@ class Match:
                 self.canvas.draw_text(str(self.player.score)+"/"+str(self.maxscore), 20, 3*self.width/4-30, 2*self.height/10)
             self.canvas.update()
 
-        # Update Canvas 
-        self.update()
-        self.canvas.draw_background()
-        if self.winner == 1:
-            self.canvas.draw_text("Vitória de "+self.eu[1]+"!", 24, 10, 0)
-        else:
-            self.canvas.draw_text("Vitória de "+self.ele[1]+"!", 24, 10, 0)
-        pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
-        self.canvas.update()
-        pygame.quit()
+        done = False
+        while not done:
+            self.clock.tick(15)
+            qntClientes = len(reply)
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.destroy()
+                        raise GetOutOfLoop
+                    elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
+                        return self.clientList(str(self.net.id) + ":selfdelete")
+            # Update Canvas 
+            self.update()
+            self.canvas.draw_background()
+            if self.winner == 1:
+                self.canvas.draw_text("Vitória de "+self.eu[1]+"!", 24, 10, 0)
+            elif self.winner == 2:
+                self.canvas.draw_text("Vitória de "+self.ele[1]+"!", 24, 10, 0)
+            else:
+                self.canvas.draw_text("A conexão foi finalizada!", 24, 10, 0)            
+            pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
+            pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
+            self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
+            self.canvas.update()
+            pygame.quit()
 
     def update(self):
         self.ball.x += self.ball.xv
