@@ -112,7 +112,7 @@ class Game:
                     elif event.key == pygame.K_F5:
                         reply = self.clientList(str(self.net.id) + ":refresh")
                     elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
-                        if oponente != 0:
+                        if qntClientes != 0:
                             return reply[oponente-1]
                     elif event.key == pygame.K_UP and oponente > 1:
                         oponente -= 1
@@ -208,7 +208,7 @@ class Match:
         self.player = Player(0, 50, (255,0,0), 0)
         self.player2 = Player(self.width-10, 100, (0,255,0), 0)
         self.ball = Ball(self.width/2, self.height/2,(0,0,255))
-        self.canvas = Canvas(self.width, self.height, "Partida em andamento...")
+        self.canvas = Canvas(self.width, self.height, "Pong! - Túlio Silva Jardim")
 
     def run(self):
         clock = pygame.time.Clock()
@@ -290,7 +290,7 @@ class Match:
         done = False
         clock = pygame.time.Clock()
         while not done:
-            clock.tick(60)
+            clock.tick(15)
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -303,10 +303,12 @@ class Match:
             # Update Canvas 
             self.update()
             self.canvas.draw_background()
-            if self.winner == 1:
+            if (self.winner == 1 and self.lado == "1") or (self.winner == 2 and self.lado == "2"):
                 self.canvas.draw_text("Vitória de "+self.eu[1]+"!", 24, 10, 0)
-            elif self.winner == 2:
+                self.canvas.image_center("venci.jpg", 160, 80)
+            elif self.winner != 0:
                 self.canvas.draw_text("Vitória de "+self.ele[1]+"!", 24, 10, 0)
+                self.canvas.image_center("perdi.jpg", 160, 80)
             else:
                 self.canvas.draw_text("A conexão foi finalizada!", 24, 10, 0)            
             pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
@@ -348,9 +350,9 @@ class Match:
                 self.pointScored()
 
     def pointScored(self):
-        if (self.player.score == self.maxscore) and (self.lado == "1") or (self.player2.score == self.maxscore) and (self.lado == "2"):
+        if (self.player.score >= self.maxscore):
             self.winner = 1
-        elif (self.player2.score == self.maxscore) and (self.lado == "1") or (self.player.score == self.maxscore) and (self.lado == "2"):
+        elif (self.player2.score >= self.maxscore):
             self.winner = 2
         else:
             self.ball = Ball(self.width/2, self.height/2,(0,0,255))
@@ -374,6 +376,10 @@ class Canvas:
         font = pygame.font.Font("lato.ttf", size)
         render = font.render(text, 1, (0,0,0))
 
+        self.screen.blit(render, (x,y))
+
+    def image_center(self, filename, x, y):
+        render = pygame.image.load(filename)
         self.screen.blit(render, (x,y))
 
     def get_canvas(self):
