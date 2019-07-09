@@ -68,7 +68,7 @@ def threaded_client(conn, addr):
                     matchOn[arr[0]][1] = arr[2]
                     reply = str(matchOn[matchOn[arr[0]][0][0]][1]) # reply é posição do inimigo
                 else:
-                    reply = ":acabou:0"
+                    reply = str(arr[0])+":acabou:0"
                     if arr[0] in matchOn:
                         del matchOn[arr[0]]
 
