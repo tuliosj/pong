@@ -246,9 +246,10 @@ class Match:
                     reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
                 else:
                     reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y)))
-                if reply.split(":")[1] == "acabou":
+                split = reply.split(":")
+                if len(split) > 1 and split == "acabou":
                     done = True
-                    self.winner = int(reply.split(":")[2])
+                    self.winner = int(split)
                 else:
                     self.player2.y = int(reply)
             else:
@@ -256,9 +257,10 @@ class Match:
                     reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
                 else:
                     reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y))
-                if reply.split(":")[1] == "acabou":
+                split = reply.split(":")
+                if len(split) > 1 and split == "acabou":
                     done = True
-                    self.winner = int(reply.split(":")[2])
+                    self.winner = int(split[2])
                 else:
                     reply = reply.split(":pos:")[0].split(",")
                     self.player.y = int(reply[0])
