@@ -246,39 +246,37 @@ class Match:
                 if self.winner != 0:
                     reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
                 else:
-                    reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y)) + ":" + str(self.player.score) + "," + str(self.player2.score))
+                    reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y)) + "," + str(self.player.score) + "," + str(self.player2.score))
                 split = reply.split(":")
                 if len(split) > 1 and split[1] == "acabou":
                     done = True
                     self.winner = int(split[2])
                 else:
-                    reply = reply.split(":")
+                    reply = reply.split(",")
                     self.player2.y = int(reply[0])
-                    score = reply[1].split(",")
-                    if self.player.score < int(score[0]):
-                        self.player.score = int(score[0])
-                    if self.player2.score < int(score[1]):
-                        self.player2.score = int(score[1])
+                    if self.player.score < int(reply[1]):
+                        self.player.score = int(reply[1])
+                    if self.player2.score < int(reply[2]):
+                        self.player2.score = int(reply[2])
             else:
                 if self.winner != 0:
                     reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
                 else:
-                    reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y) + ":" + str(self.player2.score) + "," + str(self.player.score))
+                    reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y) + "," + str(self.player2.score) + "," + str(self.player.score))
                 split = reply.split(":")
                 if len(split) > 1 and split[1] == "acabou":
                     done = True
                     self.winner = int(split[2])
                 else:
-                    score = reply.split(":")[3].split(",")
                     reply = reply.split(":pos:")[0].split(",")
                     self.player.y = int(reply[0])
                     if len(reply) > 1:
                         self.ball.x = int(reply[1])
                         self.ball.y = int(reply[2])
-                    if self.player2.score < int(score[0]):
-                        self.player2.score = int(score[0])
-                    if self.player.score < int(score[1]):
-                        self.player.score = int(score[1])
+                    if self.player2.score < int(reply[3]):
+                        self.player2.score = int(reply[3])
+                    if self.player.score < int(reply[4]):
+                        self.player.score = int(reply[4])
 
             # Update Canvas 
             self.update()
