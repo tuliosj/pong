@@ -196,7 +196,7 @@ class Game:
 
 class Match:
     maxscore = 5
-    winner = 0
+    winner = "0"
 
     def __init__(self, w, h, eu, ele, lado):
         self.net = Network()
@@ -216,7 +216,7 @@ class Match:
         while not done:
             clock.tick(60)
 
-            if self.winner != 0:
+            if self.winner != "0":
                 done = True
 
             for event in pygame.event.get():
@@ -243,14 +243,14 @@ class Match:
 
             # Send Network Stuff
             if self.lado == "1":
-                if self.winner != 0:
-                    reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
+                if self.winner != "0":
+                    reply = self.net.send(str(self.net.id) + ":acabou:" + self.winner)
                 else:
                     reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y)) + "," + str(self.player.score) + "," + str(self.player2.score))
                 split = reply.split(":")
                 if len(split) > 1 and split[1] == "acabou":
                     done = True
-                    self.winner = int(split[2])
+                    self.winner = split[2]
                 else:
                     reply = reply.split(",")
                     self.player2.y = int(reply[0])
@@ -260,14 +260,14 @@ class Match:
                         if self.player2.score < int(reply[2]):
                             self.player2.score = int(reply[2])
             else:
-                if self.winner != 0:
-                    reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
+                if self.winner != "0":
+                    reply = self.net.send(str(self.net.id) + ":acabou:" + self.winner)
                 else:
                     reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y) + "," + str(self.player2.score) + "," + str(self.player.score))
                 split = reply.split(":")
                 if len(split) > 1 and split[1] == "acabou":
                     done = True
-                    self.winner = int(split[2])
+                    self.winner = split[2]
                 else:
                     reply = reply.split(":pos:")[0].split(",")
                     self.player.y = int(reply[0])
@@ -305,19 +305,19 @@ class Match:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        return self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
+                        return self.net.send(str(self.net.id) + ":acabou:" + self.winner)
                     elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
                         return str(self.net.id) + ":selfdelete"
 
-            reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
+            reply = self.net.send(str(self.net.id) + ":acabou:" + self.winner)
 
             # Update Canvas 
             self.update()
             self.canvas.draw_background()
-            if (self.winner == 1 and self.lado == "1") or (self.winner == 2 and self.lado == "2"):
+            if self.winner == self.eu[0]:
                 self.canvas.draw_text("Vitória de "+self.eu[1]+"!", 24, 10, 0)
                 self.canvas.image_center("venci.jpg", 160, 80)
-            elif self.winner != 0:
+            elif self.winner != "0":
                 self.canvas.draw_text("Vitória de "+self.ele[1]+"!", 24, 10, 0)
                 self.canvas.image_center("perdi.jpg", 160, 80)
             else:
@@ -362,9 +362,9 @@ class Match:
 
     def pointScored(self):
         if (self.player.score >= self.maxscore):
-            self.winner = 1
+            self.winner = eu[0]
         elif (self.player2.score >= self.maxscore):
-            self.winner = 2
+            self.winner = ele[0]
         else:
             self.ball = Ball(self.width/2, self.height/2,(0,0,255))
             self.player = Player(self.player.x, int((self.width-self.player.height)/2), self.player.color, self.player.score)
