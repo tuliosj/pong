@@ -254,10 +254,11 @@ class Match:
                 else:
                     reply = reply.split(",")
                     self.player2.y = int(reply[0])
-                    if self.player.score < int(reply[1]):
-                        self.player.score = int(reply[1])
-                    if self.player2.score < int(reply[2]):
-                        self.player2.score = int(reply[2])
+                    if len(reply) > 2:
+                        if self.player.score < int(reply[1]):
+                            self.player.score = int(reply[1])
+                        if self.player2.score < int(reply[2]):
+                            self.player2.score = int(reply[2])
             else:
                 if self.winner != 0:
                     reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
@@ -270,13 +271,14 @@ class Match:
                 else:
                     reply = reply.split(":pos:")[0].split(",")
                     self.player.y = int(reply[0])
-                    if len(reply) > 1:
+                    if len(reply) > 2:
                         self.ball.x = int(reply[1])
                         self.ball.y = int(reply[2])
-                    if self.player2.score < int(reply[3]):
-                        self.player2.score = int(reply[3])
-                    if self.player.score < int(reply[4]):
-                        self.player.score = int(reply[4])
+                        if len(reply) > 3:
+                            if self.player2.score < int(reply[3]):
+                                self.player2.score = int(reply[3])
+                            if self.player.score < int(reply[4]):
+                                self.player.score = int(reply[4])
 
             # Update Canvas 
             self.update()
