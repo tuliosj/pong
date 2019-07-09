@@ -287,8 +287,9 @@ class Match:
             self.canvas.update()
 
         done = False
-        pygame.init()
+        clock = pygame.time.Clock()
         while not done:
+            clock.tick(60)
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
