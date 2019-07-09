@@ -220,8 +220,9 @@ class Match:
                 done = True
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        done = True
 
             keys = pygame.key.get_pressed()
 
@@ -293,10 +294,12 @@ class Match:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.destroy()
-                        raise GetOutOfLoop
+                        return self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
                     elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
                         return self.clientList(str(self.net.id) + ":selfdelete")
+
+            reply = self.net.send(str(self.net.id) + ":acabou:" + str(self.winner))
+
             # Update Canvas 
             self.update()
             self.canvas.draw_background()
@@ -311,7 +314,6 @@ class Match:
             pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
             self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
             self.canvas.update()
-            pygame.quit()
 
     def update(self):
         self.ball.x += self.ball.xv
