@@ -362,9 +362,9 @@ class Match:
 
     def pointScored(self):
         if (self.player.score >= self.maxscore):
-            self.winner = eu[0]
+            self.winner = self.eu[0]
         elif (self.player2.score >= self.maxscore):
-            self.winner = ele[0]
+            self.winner = self.ele[0]
         else:
             self.ball = Ball(self.width/2, self.height/2,(0,0,255))
             self.player = Player(self.player.x, int((self.width-self.player.height)/2), self.player.color, self.player.score)
