@@ -55,7 +55,8 @@ def threaded_client(conn, addr):
                 matchOn[arr[0]][1] = "acabou:" + arr[2]
             elif (arr[1]=="selfdelete"):
                 p2 = matchOn[arr[0]][0][0]
-                del matchOn[p2]
+                if p2 in matchOn:
+                    del matchOn[p2]
                 for client in clientList:
                     if(client[0] == p2):
                         clientList.remove(client)
@@ -67,8 +68,9 @@ def threaded_client(conn, addr):
                     matchOn[arr[0]][1] = arr[2]
                     reply = str(matchOn[matchOn[arr[0]][0][0]][1]) # reply é posição do inimigo
                 else:
-                    reply = "acabou:0"
-                    del matchOn[arr[0]]
+                    reply = ":acabou:0"
+                    if arr[0] in matchOn:
+                        del matchOn[arr[0]]
 
        
         print("Sending: " + reply)
@@ -76,13 +78,13 @@ def threaded_client(conn, addr):
     
 
     print("Connection Closed")
-    print(matchOn)
     for client in clientList:
         if(client[0] == addr[0]):
             clientList.remove(client)
             break
 
-    del matchOn[addr[0]]
+    if addr[0] in matchOn:
+        del matchOn[addr[0]]
     conn.close()
 
 def waitlistManagement (p1, p2):
