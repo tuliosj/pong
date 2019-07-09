@@ -247,9 +247,9 @@ class Match:
                 else:
                     reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player.y) + "," + str(int(self.ball.x)) + "," + str(int(self.ball.y)))
                 split = reply.split(":")
-                if len(split) > 1 and split == "acabou":
+                if len(split) > 1 and split[1] == "acabou":
                     done = True
-                    self.winner = int(split)
+                    self.winner = int(split[2])
                 else:
                     self.player2.y = int(reply)
             else:
@@ -258,7 +258,7 @@ class Match:
                 else:
                     reply = self.net.send(str(self.net.id) + ":pos:" + str(self.player2.y))
                 split = reply.split(":")
-                if len(split) > 1 and split == "acabou":
+                if len(split) > 1 and split[1] == "acabou":
                     done = True
                     self.winner = int(split[2])
                 else:
@@ -287,6 +287,7 @@ class Match:
             self.canvas.update()
 
         done = False
+        pygame.init()
         while not done:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -324,7 +325,10 @@ class Match:
                 self.ball.xv = (2+angulo/12)
                 self.ball.yv = angulo/7
             else:
-                self.player2.score += 1
+                if self.lado == "1":
+                    self.player2.score += 1
+                else:
+                    self.player.score += 1
                 self.pointScored()
 
         # Se a bola bater no canto direito
@@ -334,7 +338,10 @@ class Match:
                 self.ball.xv = -(2+angulo/12)
                 self.ball.yv = -angulo/7
             else:
-                self.player.score += 1
+                if self.lado == "2":
+                    self.player2.score += 1
+                else:
+                    self.player.score += 1
                 self.pointScored()
 
     def pointScored(self):

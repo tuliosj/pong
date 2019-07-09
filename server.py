@@ -52,7 +52,7 @@ def threaded_client(conn, addr):
                 if reply != "nada":
                     matchOn[arr[2]] = [addr, 0]
             elif (arr[1]=="acabou"):
-                matchOn[arr[0]][1] = "acabou:" + arr[2]
+                matchOn[arr[0]][1] = arr[0] + "acabou:" + arr[2]
             elif (arr[1]=="selfdelete"):
                 p2 = matchOn[arr[0]][0][0]
                 if p2 in matchOn:
