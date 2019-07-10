@@ -300,6 +300,22 @@ class Match:
 
         done = False
         clock = pygame.time.Clock()
+        # Update Canvas 
+        self.update()
+        self.canvas.draw_background()
+        if self.winner == self.eu[0]:
+            self.canvas.draw_text("Vitória de "+self.eu[1]+"!", 24, 10, 0)
+            self.canvas.image_center("venci.jpg", 160, 80)
+        elif self.winner != "0":
+            self.canvas.draw_text("Vitória de "+self.ele[1]+"!", 24, 10, 0)
+            self.canvas.image_center("perdi.jpg", 160, 80)
+        else:
+            self.canvas.draw_text("A conexão foi finalizada!", 24, 10, 0)            
+        pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
+        pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
+        pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
+        self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
+        self.canvas.update()
         while not done:
             clock.tick(15)
             for event in pygame.event.get():
@@ -310,23 +326,6 @@ class Match:
                         return str(self.net.id) + ":selfdelete"
 
             reply = self.net.send(str(self.net.id) + ":acabou:" + self.winner)
-
-            # Update Canvas 
-            self.update()
-            self.canvas.draw_background()
-            if self.winner == self.eu[0]:
-                self.canvas.draw_text("Vitória de "+self.eu[1]+"!", 24, 10, 0)
-                self.canvas.image_center("venci.jpg", 160, 80)
-            elif self.winner != "0":
-                self.canvas.draw_text("Vitória de "+self.ele[1]+"!", 24, 10, 0)
-                self.canvas.image_center("perdi.jpg", 160, 80)
-            else:
-                self.canvas.draw_text("A conexão foi finalizada!", 24, 10, 0)            
-            pygame.draw.rect(self.canvas.get_canvas(), (200,50,50), (0, 35, self.width, 2), 0)
-            pygame.draw.rect(self.canvas.get_canvas(), (0,0,0) ,(self.width-90, self.height-50, 80, 40), 0)
-            pygame.draw.rect(self.canvas.get_canvas(), (180,255,180) ,(self.width-85, self.height-45, 70, 30), 0)
-            self.canvas.draw_text("Enter", 14, self.width-68, self.height-38)
-            self.canvas.update()
 
     def update(self):
         self.ball.x += self.ball.xv

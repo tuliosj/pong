@@ -22,7 +22,7 @@ s.listen(2)
 print("Waiting for a connection")
 
 def threaded_client(conn, addr):
-    global clientList, matchOn
+    global clientList, matchOn, waitList
     currentId = addr[0]
     conn.send(str.encode(currentId))
     reply = ''
@@ -47,6 +47,10 @@ def threaded_client(conn, addr):
                 reply = addr[0]
                 for client in clientList:
                     reply += ";"+client[0]+": "+client[1]
+                for client in waitlist:
+                    if client[0] == addr[0]:
+                        waitlist.remove(client)
+                        break
             elif (arr[1]=="wait"):
                 reply = waitlistManagement(arr[0],arr[2])
                 if reply != "nada":
