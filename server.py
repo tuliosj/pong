@@ -90,6 +90,11 @@ def threaded_client(conn, addr):
 
     if addr[0] in matchOn:
         del matchOn[addr[0]]
+
+    for client in waitlist:
+        if client[0] == addr[0]:
+            waitlist.remove(client)
+            break
     conn.close()
 
 def waitlistManagement (p1, p2):

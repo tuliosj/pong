@@ -197,6 +197,7 @@ class Game:
 class Match:
     maxscore = 5
     winner = "0"
+    rebatidas = 0
 
     def __init__(self, w, h, eu, ele, lado):
         self.net = Network()
@@ -337,8 +338,9 @@ class Match:
         if(self.ball.x<self.player.width):
             if(self.ball.y>self.player.y and self.ball.y<self.player.y+self.player.height):
                 angulo = abs(self.ball.y-self.player.y-self.player.height/2)
-                self.ball.xv = (2+angulo/12)
-                self.ball.yv = angulo/7
+                self.ball.xv = max((2+angulo/12), 0.5) + self.rebatidas
+                self.ball.yv = angulo/7 + self.rebatidas
+                self.rebatidas += 0.2
             else:
                 if self.lado == "1":
                     self.player2.score += 1
@@ -350,8 +352,9 @@ class Match:
         if(self.ball.x>self.width-self.player.width-self.ball.width):
             if(self.ball.y>self.player2.y and self.ball.y<self.player2.y+self.player2.height):
                 angulo = abs(self.ball.y-self.player2.y-self.player2.height/2)
-                self.ball.xv = -(2+angulo/12)
-                self.ball.yv = -angulo/7
+                self.ball.xv = min(-(2+angulo/12), -0.5) - self.rebatidas
+                self.ball.yv = -angulo/7 - self.rebatidas
+                self.rebatidas += 0.2
             else:
                 if self.lado == "2":
                     self.player2.score += 1
