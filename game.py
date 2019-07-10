@@ -363,6 +363,7 @@ class Match:
                 self.pointScored()
 
     def pointScored(self):
+        self.rebatidas = 0
         if (self.player.score >= self.maxscore):
             self.winner = self.eu[0]
         elif (self.player2.score >= self.maxscore):
